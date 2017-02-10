@@ -5,6 +5,7 @@ Decision Tree Source Code for Machine Learning in Action Ch. 3
 '''
 from math import log
 import operator
+#import pprint
 
 def createDataSet():
     dataSet = [[1, 1, 'yes'],
@@ -34,13 +35,13 @@ def splitDataSet(dataSet, axis, value):
     for featVec in dataSet:
         if featVec[axis] == value:
             reducedFeatVec = featVec[:axis]     #chop out axis used for splitting
-            reducedFeatVec.extend(featVec[axis+1:])
+            reducedFeatVec.extend(featVec[axis+1:])#将以该维度为axis的数据从vec中去掉，然后得到相应的分类，也就是说以每一种属性的值作为分类，得到分类结果
             retDataSet.append(reducedFeatVec)
     return retDataSet
     
 def chooseBestFeatureToSplit(dataSet):
     numFeatures = len(dataSet[0]) - 1      #the last column is used for the labels最后一列是标签，所以不把最后一列作为分类标准
-    baseEntropy = calcShannonEnt(dataSet)
+    baseEntropy = calcShannonEnt(dataSet) #初始的数据集合的熵值
     bestInfoGain = 0.0; bestFeature = -1
     for i in range(numFeatures):        #iterate over all the features
         featList = [example[i] for example in dataSet]#create a list of all the examples of this feature
@@ -50,7 +51,7 @@ def chooseBestFeatureToSplit(dataSet):
             subDataSet = splitDataSet(dataSet, i, value)
             prob = len(subDataSet)/float(len(dataSet))
             newEntropy += prob * calcShannonEnt(subDataSet)     
-        infoGain = baseEntropy - newEntropy     #calculate the info gain; ie reduction in entropy
+        infoGain = baseEntropy - newEntropy     #calculate the info gain; ie reduction in entropy infoGain应该是最大更合适,也就是说根据该属性值得到的数据集合的熵应该比原来的尽量小
         if (infoGain > bestInfoGain):       #compare this to the best gain so far
             bestInfoGain = infoGain         #if better than current best, set to best
             bestFeature = i
@@ -61,8 +62,8 @@ def majorityCnt(classList):
     for vote in classList:
         if vote not in classCount.keys(): classCount[vote] = 0
         classCount[vote] += 1
-    sortedClassCount = sorted(classCount.iteritems(), key=operator.itemgetter(1), reverse=True)
-    return sortedClassCount[0][0]
+    sortedClassCount = sorted(classCount.items(),key=lambda it:it[1],reverse=True)#降序排列
+    return sortedClassCount[0][0] #获取按照降序排列后的第一个分类的名字
 
 def createTree(dataSet,labels):
     classList = [example[-1] for example in dataSet]
@@ -78,7 +79,7 @@ def createTree(dataSet,labels):
     uniqueVals = set(featValues)
     for value in uniqueVals:
         subLabels = labels[:]       #copy all of labels, so trees don't mess up existing labels
-        myTree[bestFeatLabel][value] = createTree(splitDataSet(dataSet, bestFeat, value),subLabels)
+        myTree[bestFeatLabel][value] = createTree(splitDataSet(dataSet, bestFeat, value),subLabels)#每一次splitDataSet之后，数据集合都会变小
     return myTree                            
     
 def classify(inputTree,featLabels,testVec):
@@ -102,4 +103,8 @@ def grabTree(filename):
     import pickle
     fr = open(filename)
     return pickle.load(fr)
+if __name__ == "__main__":
+    mydat,labels = createDataSet()
+    mytree = createTree(mydat,labels)
+    pprint.pprint(mytree)
     
