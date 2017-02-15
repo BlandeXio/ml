@@ -19,20 +19,20 @@ def createVocabList(dataSet):
     vocabSet = set([])  #create empty set
     for document in dataSet:
         vocabSet = vocabSet | set(document) #union of the two sets
-    return list(vocabSet)
+    return list(vocabSet) #返回所有的不重复的单词
 
 def setOfWords2Vec(vocabList, inputSet):
     returnVec = [0]*len(vocabList)
     for word in inputSet:
         if word in vocabList:
             returnVec[vocabList.index(word)] = 1
-        else: print "the word: %s is not in my Vocabulary!" % word
+        else: print("the word: %s is not in my Vocabulary!" % word)
     return returnVec
 
 def trainNB0(trainMatrix,trainCategory):
     numTrainDocs = len(trainMatrix)
     numWords = len(trainMatrix[0])
-    pAbusive = sum(trainCategory)/float(numTrainDocs)
+    pAbusive = sum(trainCategory)/float(numTrainDocs)#计算侮辱性言论的比例
     p0Num = ones(numWords); p1Num = ones(numWords)      #change to ones() 
     p0Denom = 2.0; p1Denom = 2.0                        #change to 2.0
     for i in range(numTrainDocs):

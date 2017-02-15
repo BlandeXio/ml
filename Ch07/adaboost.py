@@ -42,8 +42,8 @@ def buildStump(dataArr,classLabels,D):
     numSteps = 10.0; bestStump = {}; bestClasEst = mat(zeros((m,1)))
     minError = inf #init error sum, to +infinity
     for i in range(n):#loop over all dimensions
-        rangeMin = dataMatrix[:,i].min(); rangeMax = dataMatrix[:,i].max();
-        stepSize = (rangeMax-rangeMin)/numSteps
+        rangeMin = dataMatrix[:,i].min(); rangeMax = dataMatrix[:,i].max();#找出某一个维度的最大值与最小值
+        stepSize = (rangeMax-rangeMin)/numSteps#分割数值段取值
         for j in range(-1,int(numSteps)+1):#loop over all range in current dimension
             for inequal in ['lt', 'gt']: #go over less than and greater than
                 threshVal = (rangeMin + float(j) * stepSize)
@@ -57,7 +57,7 @@ def buildStump(dataArr,classLabels,D):
                     bestClasEst = predictedVals.copy()
                     bestStump['dim'] = i
                     bestStump['thresh'] = threshVal
-                    bestStump['ineq'] = inequal
+                    bestStump['ineq'] = inequal #bestStump保存了最佳分类的维度，阈值，以及关于该阈值的不等号
     return bestStump,minError,bestClasEst
 
 
@@ -79,7 +79,7 @@ def adaBoostTrainDS(dataArr,classLabels,numIt=40):
         #calc training error of all classifiers, if this is 0 quit for loop early (use break)
         aggClassEst += alpha*classEst
         #print "aggClassEst: ",aggClassEst.T
-        aggErrors = multiply(sign(aggClassEst) != mat(classLabels).T,ones((m,1)))
+        aggErrors = multiply(sign(aggClassEst) != mat(classLabels).T,ones((m,1))) #sign函数是符号函数如果x是负值则输出-1，如果是正值则是1
         errorRate = aggErrors.sum()/m
         print "total error: ",errorRate
         if errorRate == 0.0: break
