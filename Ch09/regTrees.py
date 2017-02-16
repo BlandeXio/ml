@@ -15,15 +15,15 @@ def loadDataSet(fileName):      #general function to parse tab -delimited floats
     return dataMat
 
 def binSplitDataSet(dataSet, feature, value):
-    mat0 = dataSet[nonzero(dataSet[:,feature] > value)[0],:][0]
+    mat0 = dataSet[nonzero(dataSet[:,feature] > value)[0],:][0] #nonezero返回使得不等式成立的矩阵索引，这里返回的是行索引。
     mat1 = dataSet[nonzero(dataSet[:,feature] <= value)[0],:][0]
     return mat0,mat1
 
 def regLeaf(dataSet):#returns the value used for each leaf
-    return mean(dataSet[:,-1])
+    return mean(dataSet[:,-1]) #计算的是每一个目标值的均值
 
 def regErr(dataSet):
-    return var(dataSet[:,-1]) * shape(dataSet)[0]
+    return var(dataSet[:,-1]) * shape(dataSet)[0] #计算每一个目标值的方差和
 
 def linearSolve(dataSet):   #helper function used in two places
     m,n = shape(dataSet)
@@ -105,7 +105,7 @@ def prune(tree, testData):
         treeMean = (tree['left']+tree['right'])/2.0
         errorMerge = sum(power(testData[:,-1] - treeMean,2))
         if errorMerge < errorNoMerge: 
-            print "merging"
+            print("merging")
             return treeMean
         else: return tree
     else: return tree
