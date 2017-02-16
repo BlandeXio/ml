@@ -10,13 +10,15 @@ def loadDataSet(fileName):      #general function to parse tab -delimited floats
     fr = open(fileName)
     for line in fr.readlines():
         curLine = line.strip().split('\t')
+        #print(type(curLine))
+        #print(curLine)
         fltLine = map(float,curLine) #map all elements to float()
-        dataMat.append(fltLine)
+        dataMat.append(list(fltLine))#@@源代码中错误的地方,将map类型转换为list类型，不然后面平均值计算不支持map类型
     return dataMat
 
 def binSplitDataSet(dataSet, feature, value):
-    mat0 = dataSet[nonzero(dataSet[:,feature] > value)[0],:][0] #nonezero返回使得不等式成立的矩阵索引，这里返回的是行索引。
-    mat1 = dataSet[nonzero(dataSet[:,feature] <= value)[0],:][0]
+    mat0 = dataSet[nonzero(dataSet[:,feature] > value)[0],:] #nonezero返回使得不等式成立的矩阵索引，这里返回的是行索引。@@这里修改源代码错误的地方，后面的[0]应该被去掉。
+    mat1 = dataSet[nonzero(dataSet[:,feature] <= value)[0],:]
     return mat0,mat1
 
 def regLeaf(dataSet):#returns the value used for each leaf
@@ -45,6 +47,7 @@ def modelErr(dataSet):
     yHat = X * ws
     return sum(power(Y - yHat,2))
 
+
 def chooseBestSplit(dataSet, leafType=regLeaf, errType=regErr, ops=(1,4)):
     tolS = ops[0]; tolN = ops[1]
     #if all the target variables are the same value: quit and return value
@@ -55,7 +58,7 @@ def chooseBestSplit(dataSet, leafType=regLeaf, errType=regErr, ops=(1,4)):
     S = errType(dataSet)
     bestS = inf; bestIndex = 0; bestValue = 0
     for featIndex in range(n-1):
-        for splitVal in set(dataSet[:,featIndex]):
+        for splitVal in set(dataSet[:,featIndex].T.A.tolist()[0]):# @@源代码中此处是matrix是不可hash的此处转化为list.
             mat0, mat1 = binSplitDataSet(dataSet, featIndex, splitVal)
             if (shape(mat0)[0] < tolN) or (shape(mat1)[0] < tolN): continue
             newS = errType(mat0) + errType(mat1)
@@ -134,3 +137,7 @@ def createForeCast(tree, testData, modelEval=regTreeEval):
     for i in range(m):
         yHat[i,0] = treeForeCast(tree, mat(testData[i]), modelEval)
     return yHat
+if __name__ == '__main__':
+    myDat = loadDataSet(r"E:\github\ml\Ch09\ex00.txt")
+    myMat = mat(myDat)
+    print(createTree(myMat))

@@ -162,7 +162,7 @@ def searchForSet(retX, retY, setNum, yr, numPce, origPrc):
             for item in listOfInv:
                 sellingPrice = item['price']
                 if  sellingPrice > origPrc * 0.5:
-                    print "%d\t%d\t%d\t%f\t%f" % (yr,numPce,newFlag,origPrc, sellingPrice)
+                    print("%d\t%d\t%d\t%f\t%f" % (yr,numPce,newFlag,origPrc, sellingPrice))
                     retX.append([yr, numPce, newFlag, origPrc])
                     retY.append(sellingPrice)
         except: print 'problem with item %d' % i
