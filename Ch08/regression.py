@@ -145,12 +145,12 @@ def stageWise(xArr,yArr,eps=0.01,numIt=100):
     
 from time import sleep
 import json
-import urllib2
+import urllib
 def searchForSet(retX, retY, setNum, yr, numPce, origPrc):
     sleep(10)
     myAPIstr = 'AIzaSyD2cR2KFyx12hXu6PFU-wrWot3NXvko8vY'
     searchURL = 'https://www.googleapis.com/shopping/search/v1/public/products?key=%s&country=US&q=lego+%d&alt=json' % (myAPIstr, setNum)
-    pg = urllib2.urlopen(searchURL)
+    pg = urllib.request.urlopen(searchURL)
     retDict = json.loads(pg.read())
     for i in range(len(retDict['items'])):
         try:
