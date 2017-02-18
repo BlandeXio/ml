@@ -106,7 +106,7 @@ def prune(tree, testData):
         errorNoMerge = sum(power(lSet[:,-1] - tree['left'],2)) +\
             sum(power(rSet[:,-1] - tree['right'],2))
         treeMean = (tree['left']+tree['right'])/2.0
-        errorMerge = sum(power(testData[:,-1] - treeMean,2))
+        errorMerge = sum(power(testData[:,-1] - treeMean,2))#这里testData如果不是一个值那就是一列向量，每一个向量减去treemean,然后向量中的每一个元素平方
         if errorMerge < errorNoMerge: 
             print("merging")
             return treeMean
@@ -118,7 +118,7 @@ def regTreeEval(model, inDat):
 
 def modelTreeEval(model, inDat):
     n = shape(inDat)[1]
-    X = mat(ones((1,n+1)))
+    X = mat(ones((1,n+1)))#列向量
     X[:,1:n+1]=inDat
     return float(X*model)
 
@@ -138,6 +138,6 @@ def createForeCast(tree, testData, modelEval=regTreeEval):
         yHat[i,0] = treeForeCast(tree, mat(testData[i]), modelEval)
     return yHat
 if __name__ == '__main__':
-    myDat = loadDataSet(r"E:\github\ml\Ch09\ex00.txt")
+    myDat = loadDataSet(r"E:\github\ml\Ch09\ex0.txt")
     myMat = mat(myDat)
     print(createTree(myMat))
