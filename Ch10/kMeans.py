@@ -24,7 +24,7 @@ def randCent(dataSet, k):
     for j in range(n):#create random cluster centers, within bounds of each dimension
         minJ = min(dataSet[:,j]) 
         rangeJ = float(max(dataSet[:,j]) - minJ)
-        centroids[:,j] = mat(minJ + rangeJ * random.rand(k,1))
+        centroids[:,j] = mat(minJ + rangeJ * random.rand(k,1)) #random.rand 生成k行一列，每一个元素取值都在1以内的数字
     return centroids
     
 def kMeans(dataSet, k, distMeas=distEclud, createCent=randCent):
@@ -43,10 +43,10 @@ def kMeans(dataSet, k, distMeas=distEclud, createCent=randCent):
                     minDist = distJI; minIndex = j
             if clusterAssment[i,0] != minIndex: clusterChanged = True
             clusterAssment[i,:] = minIndex,minDist**2
-        print centroids
+        print(centroids)
         for cent in range(k):#recalculate centroids
-            ptsInClust = dataSet[nonzero(clusterAssment[:,0].A==cent)[0]]#get all the point in this cluster
-            centroids[cent,:] = mean(ptsInClust, axis=0) #assign centroid to mean 
+            ptsInClust = dataSet[nonzero(clusterAssment[:,0].A==cent)[0]]#计算出等于改类的数据的索引的第一个维度也就是行index然后，取出相应的行数据
+            centroids[cent,:] = mean(ptsInClust, axis=0) #assign centroid to mean,按照列计算均值
     return centroids, clusterAssment
 
 def biKmeans(dataSet, k, distMeas=distEclud):
@@ -63,7 +63,7 @@ def biKmeans(dataSet, k, distMeas=distEclud):
             centroidMat, splitClustAss = kMeans(ptsInCurrCluster, 2, distMeas)
             sseSplit = sum(splitClustAss[:,1])#compare the SSE to the currrent minimum
             sseNotSplit = sum(clusterAssment[nonzero(clusterAssment[:,0].A!=i)[0],1])
-            print "sseSplit, and notSplit: ",sseSplit,sseNotSplit
+            print("sseSplit, and notSplit: ",sseSplit,sseNotSplit)
             if (sseSplit + sseNotSplit) < lowestSSE:
                 bestCentToSplit = i
                 bestNewCents = centroidMat
@@ -71,8 +71,8 @@ def biKmeans(dataSet, k, distMeas=distEclud):
                 lowestSSE = sseSplit + sseNotSplit
         bestClustAss[nonzero(bestClustAss[:,0].A == 1)[0],0] = len(centList) #change 1 to 3,4, or whatever
         bestClustAss[nonzero(bestClustAss[:,0].A == 0)[0],0] = bestCentToSplit
-        print 'the bestCentToSplit is: ',bestCentToSplit
-        print 'the len of bestClustAss is: ', len(bestClustAss)
+        print('the bestCentToSplit is: ',bestCentToSplit)
+        print('the len of bestClustAss is: ', len(bestClustAss))
         centList[bestCentToSplit] = bestNewCents[0,:].tolist()[0]#replace a centroid with two best centroids 
         centList.append(bestNewCents[1,:].tolist()[0])
         clusterAssment[nonzero(clusterAssment[:,0].A == bestCentToSplit)[0],:]= bestClustAss#reassign new clusters, and SSE
@@ -88,7 +88,7 @@ def geoGrab(stAddress, city):
     params['location'] = '%s %s' % (stAddress, city)
     url_params = urllib.urlencode(params)
     yahooApi = apiStem + url_params      #print url_params
-    print yahooApi
+    print(yahooApi)
     c=urllib.urlopen(yahooApi)
     return json.loads(c.read())
 
@@ -102,9 +102,9 @@ def massPlaceFind(fileName):
         if retDict['ResultSet']['Error'] == 0:
             lat = float(retDict['ResultSet']['Results'][0]['latitude'])
             lng = float(retDict['ResultSet']['Results'][0]['longitude'])
-            print "%s\t%f\t%f" % (lineArr[0], lat, lng)
+            print("%s\t%f\t%f" % (lineArr[0], lat, lng))
             fw.write('%s\t%f\t%f\n' % (line, lat, lng))
-        else: print "error fetching"
+        else: print("error fetching")
         sleep(1)
     fw.close()
     
@@ -138,3 +138,7 @@ def clusterClubs(numClust=5):
         ax1.scatter(ptsInCurrCluster[:,0].flatten().A[0], ptsInCurrCluster[:,1].flatten().A[0], marker=markerStyle, s=90)
     ax1.scatter(myCentroids[:,0].flatten().A[0], myCentroids[:,1].flatten().A[0], marker='+', s=300)
     plt.show()
+
+if __name__ == "__main__":
+    datMat = mat(loadDataSet(r"E:\github\ml\Ch10\testSet.txt"))
+    myCen,clusAss = kMeans(datMat,4)

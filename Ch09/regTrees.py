@@ -137,6 +137,8 @@ def createForeCast(tree, testData, modelEval=regTreeEval):
     for i in range(m):
         yHat[i,0] = treeForeCast(tree, mat(testData[i]), modelEval)
     return yHat
+
+    
 if __name__ == '__main__':
     myDat = loadDataSet(r"E:\github\ml\Ch09\ex0.txt")
     myMat = mat(myDat)
