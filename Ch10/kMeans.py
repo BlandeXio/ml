@@ -52,8 +52,8 @@ def kMeans(dataSet, k, distMeas=distEclud, createCent=randCent):
 def biKmeans(dataSet, k, distMeas=distEclud):
     m = shape(dataSet)[0]
     clusterAssment = mat(zeros((m,2)))
-    centroid0 = mean(dataSet, axis=0).tolist()[0]
-    centList =[centroid0] #create a list with one centroid
+    centroid0 = mean(dataSet, axis=0).tolist()[0] #按照列来对数据求均值,tolist返回的是一个矩阵
+    centList =[centroid0] #create a list with one centroid#刚开始只有一个点，是所有数据的均值
     for j in range(m):#calc initial Error
         clusterAssment[j,1] = distMeas(mat(centroid0), dataSet[j,:])**2
     while (len(centList) < k):

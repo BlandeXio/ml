@@ -15,7 +15,7 @@ def createC1(dataSet):
             if not [item] in C1:
                 C1.append([item])
                 
-    C1.sort()
+    C1.sort()#按照升序排列
     return [frozenset(c) for c in C1 ]#use frozen set so we
                             #can use it as a key in a dict元素经过创建就不能更改的叫做frozenset    
 
@@ -24,7 +24,7 @@ def scanD(D, Ck, minSupport):
     for tid in D:
         for can in Ck:
             if can.issubset(tid):
-                if not ssCnt.has_key(can): ssCnt[can]=1
+                if not can in ssCnt.keys(): ssCnt[can]=1 #修改源代码
                 else: ssCnt[can] += 1
     numItems = float(len(D))
     retList = []
@@ -32,7 +32,7 @@ def scanD(D, Ck, minSupport):
     for key in ssCnt:
         support = ssCnt[key]/numItems
         if support >= minSupport:
-            retList.insert(0,key)
+            retList.insert(0,key)#向0索引处插入key,原来位置上的元素后移
         supportData[key] = support
     return retList, supportData
 
@@ -49,7 +49,7 @@ def aprioriGen(Lk, k): #creates Ck
 
 def apriori(dataSet, minSupport = 0.5):
     C1 = createC1(dataSet)
-    D = map(set, dataSet)
+    D = [set(d) for d in dataSet ]
     L1, supportData = scanD(D, C1, minSupport)
     L = [L1]
     k = 2
@@ -66,10 +66,10 @@ def generateRules(L, supportData, minConf=0.7):  #supportData is a dict coming f
     for i in range(1, len(L)):#only get the sets with two or more items
         for freqSet in L[i]:
             H1 = [frozenset([item]) for item in freqSet]
-            if (i > 1):
+            if (i > 1):#这里是索引，所以如果大于1最少为2那么频繁项集里面至少有三个元素
                 rulesFromConseq(freqSet, H1, supportData, bigRuleList, minConf)
             else:
-                calcConf(freqSet, H1, supportData, bigRuleList, minConf)
+                calcConf(freqSet, H1, supportData, bigRuleList, minConf)#如果频繁项集里面只有两个元素那么直接计算置信度
     return bigRuleList         
 
 def calcConf(freqSet, H, supportData, brl, minConf=0.7):
@@ -77,14 +77,14 @@ def calcConf(freqSet, H, supportData, brl, minConf=0.7):
     for conseq in H:
         conf = supportData[freqSet]/supportData[freqSet-conseq] #calc confidence
         if conf >= minConf: 
-            print freqSet-conseq,'-->',conseq,'conf:',conf
+            print(freqSet-conseq,'-->',conseq,'conf:',conf)
             brl.append((freqSet-conseq, conseq, conf))
             prunedH.append(conseq)
     return prunedH
 
 def rulesFromConseq(freqSet, H, supportData, brl, minConf=0.7):
     m = len(H[0])
-    if (len(freqSet) > (m + 1)): #try further merging
+    if (len(freqSet) > (m + 1)): #try further merging 之所以要大于+1在计算conf的时候要减去Ck,结果不能为空
         Hmp1 = aprioriGen(H, m+1)#create Hm+1 new candidates
         Hmp1 = calcConf(freqSet, Hmp1, supportData, brl, minConf)
         if (len(Hmp1) > 1):    #need at least two sets to merge
@@ -93,12 +93,12 @@ def rulesFromConseq(freqSet, H, supportData, brl, minConf=0.7):
 def pntRules(ruleList, itemMeaning):
     for ruleTup in ruleList:
         for item in ruleTup[0]:
-            print itemMeaning[item]
-        print "           -------->"
+            print(itemMeaning[item])
+        print("           -------->")
         for item in ruleTup[1]:
-            print itemMeaning[item]
-        print "confidence: %f" % ruleTup[2]
-        print       #print a blank line
+            print(itemMeaning[item])
+        print("confidence: %f" % ruleTup[2])
+        print()       #print a blank line
         
             
 from time import sleep
@@ -116,11 +116,11 @@ def getActionIds():
                 if action.level == 'House' and \
                 (action.stage == 'Passage' or action.stage == 'Amendment Vote'):
                     actionId = int(action.actionId)
-                    print 'bill: %d has actionId: %d' % (billNum, actionId)
+                    print('bill: %d has actionId: %d' % (billNum, actionId))
                     actionIdList.append(actionId)
                     billTitleList.append(line.strip().split('\t')[1])
         except:
-            print "problem getting bill %d" % billNum
+            print("problem getting bill %d" % billNum)
         sleep(1)                                      #delay to be polite
     return actionIdList, billTitleList
         
@@ -133,7 +133,7 @@ def getTransList(actionIdList, billTitleList): #this will return a list of lists
     voteCount = 2
     for actionId in actionIdList:
         sleep(3)
-        print 'getting votes for actionId: %d' % actionId
+        print('getting votes for actionId: %d' % actionId)
         try:
             voteList = votesmart.votes.getBillActionVotes(actionId)
             for vote in voteList:
@@ -148,6 +148,6 @@ def getTransList(actionIdList, billTitleList): #this will return a list of lists
                 elif vote.action == 'Yea':
                     transDict[vote.candidateName].append(voteCount + 1)
         except: 
-            print "problem getting actionId: %d" % actionId
+            print("problem getting actionId: %d" % actionId)
         voteCount += 2
     return transDict, itemMeaning
